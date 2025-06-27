@@ -1,0 +1,53 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+
+import { CreateCallTaskDto } from './dto/create-call-task.dto';
+import { CallTaskService } from './call-task.service';
+import { UpdateCallTaskDto, UpdateTaskStatusDto } from './dto/update-call-task.dto';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+
+@Controller('call-tasks')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class CallTaskController {
+  constructor(private callTaskService: CallTaskService) {}
+
+  @Post()
+  create(@Body() createCallTaskDto: CreateCallTaskDto) {
+    return this.callTaskService.create(createCallTaskDto);
+  }
+
+  @Get()
+  findByCallRecord(@Query('callRecordId') callRecordId: string) {
+    return this.callTaskService.findByCallRecord(callRecordId);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.callTaskService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCallTaskDto: UpdateCallTaskDto) {
+    return this.callTaskService.update(id, updateCallTaskDto);
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body() updateTaskStatusDto: UpdateTaskStatusDto) {
+    return this.callTaskService.updateStatus(id, updateTaskStatusDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.callTaskService.remove(id);
+  }
+}
