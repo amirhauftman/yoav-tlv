@@ -5,6 +5,8 @@ import { CallRecord } from './entities/call-record.entity';
 import { CreateCallRecordDto } from './dto/create-call-record.dto';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { AssignTagsDto, UpdateCallRecordDto } from './dto/update-call-record.dto';
+import { User } from 'src/user/entities/user.entity';
+import { CallStatus } from './entities/call-record.entity';
 
 @Injectable()
 export class CallRecordService {
@@ -13,27 +15,54 @@ export class CallRecordService {
     private callRecordRepository: Repository<CallRecord>,
     @InjectRepository(Tag)
     private tagRepository: Repository<Tag>,
-  ) {}
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) { }
 
   async create(createCallRecordDto: CreateCallRecordDto): Promise<CallRecord> {
-    const callRecord = this.callRecordRepository.create(createCallRecordDto);
+    const tags = createCallRecordDto.tagIds?.length
+      ? await this.tagRepository.find({ where: { id: In(createCallRecordDto.tagIds) } })
+      : [];
 
-    if (createCallRecordDto.tagIds?.length) {
-      const tags = await this.tagRepository.find({
-        where: { id: In(createCallRecordDto.tagIds) },
-      });
-      callRecord.tags = tags;
-    }
+    const assignedUser = createCallRecordDto.assignedUserId
+      ? await this.userRepository.findOneBy({ id: createCallRecordDto.assignedUserId })
+      : null;
+
+    const callRecord = new CallRecord(); // Instantiate directly to avoid DeepPartial issues
+    Object.assign(callRecord, {
+      ...createCallRecordDto,
+      status: CallStatus.OPEN,
+      tags,
+      assignedUser,
+    });
 
     return this.callRecordRepository.save(callRecord);
   }
 
-  async findAll(): Promise<CallRecord[]> {
-    return this.callRecordRepository.find({
-      relations: ['tags', 'assignedUser', 'tasks'],
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(page = 1, limit = 10, status?: string): Promise<{ items: CallRecord[]; total: number }> {
+    console.log('hereee');
+
+    const skip = (page - 1) * limit;
+
+    const query = this.callRecordRepository.createQueryBuilder('callRecord')
+      .leftJoinAndSelect('callRecord.tags', 'tag')
+      .leftJoinAndSelect('callRecord.assignedUser', 'user')
+      .leftJoinAndSelect('callRecord.tasks', 'task')
+      .leftJoinAndSelect('task.suggestedTask', 'suggestedTask');
+
+    if (status) {
+      query.andWhere('callRecord.status = :status', { status });
+    }
+
+    const [items, total] = await query
+      .orderBy('callRecord.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return { items, total };
   }
+
 
   async findOne(id: string): Promise<CallRecord> {
     const callRecord = await this.callRecordRepository.findOne({
@@ -52,14 +81,18 @@ export class CallRecordService {
     const callRecord = await this.findOne(id);
 
     if (updateCallRecordDto.tagIds !== undefined) {
-      if (updateCallRecordDto.tagIds.length > 0) {
-        const tags = await this.tagRepository.find({
-          where: { id: In(updateCallRecordDto.tagIds) },
-        });
-        callRecord.tags = tags;
-      } else {
-        callRecord.tags = [];
+      const tags = updateCallRecordDto.tagIds.length > 0
+        ? await this.tagRepository.find({ where: { id: In(updateCallRecordDto.tagIds) } })
+        : [];
+      callRecord.tags = tags;
+    }
+
+    if (updateCallRecordDto.assignedUserId) {
+      const assignedUser = await this.userRepository.findOneBy({ id: updateCallRecordDto.assignedUserId });
+      if (!assignedUser) {
+        throw new NotFoundException('Assigned user not found');
       }
+      callRecord.assignedUser = assignedUser;
     }
 
     Object.assign(callRecord, updateCallRecordDto);
@@ -81,4 +114,3 @@ export class CallRecordService {
     await this.callRecordRepository.remove(callRecord);
   }
 }
-
