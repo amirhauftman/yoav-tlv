@@ -18,8 +18,8 @@ import { CallTaskModule } from './call-task/call-task.module';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: 'Amir1996',
+      username: '****',
+      password: '****',
       database: 'yoav',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Set to false in production!
