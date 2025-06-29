@@ -26,6 +26,9 @@ export class CallTask {
   })
   status: TaskStatus;
 
+  @Column('simple-array', { nullable: true })
+  tagIds: string[];
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

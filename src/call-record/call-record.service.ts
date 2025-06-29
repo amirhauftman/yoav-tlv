@@ -39,8 +39,7 @@ export class CallRecordService {
     return this.callRecordRepository.save(callRecord);
   }
 
-  async findAll(page = 1, limit = 10, status?: string): Promise<{ items: CallRecord[]; total: number }> {
-    console.log('hereee');
+  async findAll(page = 1, limit = 5, status?: string): Promise<{ items: CallRecord[]; total: number }> {
 
     const skip = (page - 1) * limit;
 

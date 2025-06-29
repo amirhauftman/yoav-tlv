@@ -10,9 +10,6 @@ export class Tag {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true })
-  description: string;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

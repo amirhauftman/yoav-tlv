@@ -12,10 +12,9 @@ export class SuggestedTaskService {
     @InjectRepository(SuggestedTask)
     private suggestedTaskRepository: Repository<SuggestedTask>,
     private tagService: TagService,
-  ) {}
+  ) { }
 
   async create(createSuggestedTaskDto: CreateSuggestedTaskDto): Promise<SuggestedTask> {
-    // Verify tag exists
     await this.tagService.findOne(createSuggestedTaskDto.tagId);
 
     const suggestedTask = this.suggestedTaskRepository.create(createSuggestedTaskDto);

@@ -12,14 +12,6 @@ export class UpdateCallRecordDto extends PartialType(CreateCallRecordDto) {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  callerName?: string;
-
-  @IsString()
-  @IsOptional()
-  callerPhone?: string;
-
   @IsEnum(CallStatus)
   @IsOptional()
   status?: CallStatus;

@@ -24,7 +24,6 @@ export class CallRecordController {
 
   @Post()
   async create(@Body() createCallRecordDto: CreateCallRecordDto, @Request() req): Promise<CallRecord> {
-    // Optionally override assignedUserId with the authenticated user
     const userId = req.user?.sub || createCallRecordDto.assignedUserId;
     const dtoWithUser = { ...createCallRecordDto, assignedUserId: userId };
     return this.callRecordService.create(dtoWithUser);

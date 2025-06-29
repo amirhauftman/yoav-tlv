@@ -1,24 +1,23 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCallTaskDto } from './create-call-task.dto';
-import { IsString, IsOptional, IsEnum } from 'class-validator';
+
+import { IsString, IsOptional, IsEnum, IsUUID, IsArray } from 'class-validator';
 import { TaskStatus } from '../entities/call-task.entity';
 
-export class UpdateCallTaskDto extends PartialType(CreateCallTaskDto) {
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsEnum(TaskStatus)
-  @IsOptional()
-  status?: TaskStatus;
-}
-
-export class UpdateTaskStatusDto {
+export class UpdateCallTaskDto /*extends PartialType(CreateCallTaskDto) */ {
   @IsEnum(TaskStatus)
   status: TaskStatus;
 
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('all', { each: true })
+  tagIds?: string[];
+
 }
+

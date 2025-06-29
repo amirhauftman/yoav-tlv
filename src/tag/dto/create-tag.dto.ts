@@ -1,10 +1,7 @@
-import { IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateTagDto {
   @IsString()
   name: string;
 
-  @IsString()
-  @IsOptional()
-  description?: string;
 }

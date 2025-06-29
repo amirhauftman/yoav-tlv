@@ -1,20 +1,26 @@
-import { IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsArray, IsUUID } from 'class-validator';
+import { TaskStatus } from '../entities/call-task.entity';
 
 export class CreateCallTaskDto {
   @IsString()
   name: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   description?: string;
 
-  @IsUUID()
+  @IsEnum(TaskStatus)
+  status: TaskStatus;
+
+  @IsString()
   callRecordId: string;
 
-  @IsUUID()
   @IsOptional()
+  @IsString()
   suggestedTaskId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('all', { each: true })
+  tagIds?: string[];
 }
-
-
-

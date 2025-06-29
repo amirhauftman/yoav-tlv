@@ -7,9 +7,7 @@ export class UpdateTagDto extends PartialType(CreateTagDto) {
       @IsString()
       @IsOptional()
       name?: string;
-    
-      @IsString()
-      @IsOptional()
-      description?: string;
-    
+
+
+
 }

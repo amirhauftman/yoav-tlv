@@ -7,7 +7,6 @@ export enum CallStatus {
   OPEN = 'open',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
-  CLOSED = 'closed'
 }
 
 @Entity('call_records')
@@ -17,15 +16,6 @@ export class CallRecord {
 
   @Column()
   title: string;
-
-  @Column({ type: 'text', nullable: true })
-  description: string;
-
-  @Column({ nullable: true })
-  callerName: string;
-
-  @Column({ nullable: true })
-  callerPhone: string;
 
   @Column({
     type: 'enum',

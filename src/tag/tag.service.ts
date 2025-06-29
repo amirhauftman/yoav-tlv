@@ -10,7 +10,7 @@ export class TagService {
   constructor(
     @InjectRepository(Tag)
     private tagRepository: Repository<Tag>,
-  ) {}
+  ) { }
 
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     const existingTag = await this.tagRepository.findOne({
@@ -47,12 +47,14 @@ export class TagService {
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
     const tag = await this.findOne(id);
+    console.log('here');
+
 
     if (updateTagDto.name && updateTagDto.name !== tag.name) {
       const existingTag = await this.tagRepository.findOne({
         where: { name: updateTagDto.name },
       });
-
+      console.log('existingTag', existingTag);
       if (existingTag) {
         throw new ConflictException('Tag with this name already exists');
       }
